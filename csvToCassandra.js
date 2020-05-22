@@ -1,8 +1,8 @@
 const cassandra = require('cassandra-driver');
 const csv = require("csvtojson");
 const async = require('async');
-const headers = require('./headers.json');
 const argv = require('yargs').argv
+const headers = require('./headers.json');
 const executeConcurrent = cassandra.concurrent.executeConcurrent;
 
 const csvFilePath = argv.file
@@ -11,20 +11,18 @@ const tableHeaders = headers.headers.map(header => {
     const newHeader = header + ' text';
     return newHeader
 })
+const tableName = csvFilePath.split('/').pop().split('.')[0].toLowerCase().replace(/\s|-/g, '_');;
+console.log(tableName);
 
 csv({
     headers: headers.headers
-})
+    })
     .fromFile(csvFilePath)
     .then((jsonObj) => {
-        const queries = []
-        for (i in jsonObj) {
-            if (jsonObj[i].Practice_Name !== '') {
-                queries.push(
-                    [...Object.values(jsonObj[i])]
-                )
-            }
-        }
+        const queries = jsonObj.filter(item => item.Practice_Name !== '').map(item => {
+            const queryItem = [...Object.values(item)]
+            return queryItem
+        })
 
         async.series([
 
@@ -38,22 +36,23 @@ csv({
             },
 
             function dropTable(next) {
-                const query = "DROP TABLE IF EXISTS flowHealthTestTask.practicesGrid";
+                const query = `DROP TABLE IF EXISTS flowHealthTestTask.${tableName}`;
                 client.execute(query, next);
             },
 
             function createTable(next) {
-                const query = "CREATE TABLE IF NOT EXISTS flowHealthTestTask.practicesGrid (" + [...tableHeaders] + ", PRIMARY KEY(practice_name))";
+                const query = `CREATE TABLE IF NOT EXISTS flowHealthTestTask.${tableName} ( ${[...tableHeaders]} , PRIMARY KEY(practice_name))`;
                 client.execute(query, next);
             },
 
             async function insert(next) {
-                const query = 'INSERT INTO flowHealthTestTask.practicesGrid (' + [...headers.headers] + ') VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?)';
+                const query = `INSERT INTO flowHealthTestTask.${tableName} ( ${[...headers.headers]}) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?)`;
                 try {
                     await executeConcurrent(client, query, queries);
-                }
-                finally {
                     console.log(`Finished executing ${queries.length} queries.`);
+                }
+                catch (err) {
+                    console.error('There was an error', err.message, err.stack);
                 }
             },
         ],
