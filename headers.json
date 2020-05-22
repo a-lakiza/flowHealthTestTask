@@ -1,0 +1,43 @@
+{
+    "headers": [
+        "Practice_Name",
+        "Status",
+        "Platforms",
+        "Practice_Address",
+        "Line_2",
+        "City",
+        "State",
+        "Zip",
+        "Supply_Shipping_Address",
+        "Type_of_Testing",
+        "Provider",
+        "Practice_Phone",
+        "Practice_Fax",
+        "Distributor",
+        "Marketing_Group",
+        "Rep",
+        "Rep_Email",
+        "Rep_Phone",
+        "Practice_Manager",
+        "PM_Email",
+        "Practice_Manager_phone",
+        "Dropbox_Link_to_Onboard_Paperwork",
+        "Supply_Orders",
+        "Result_Portal",
+        "User_Name",
+        "Password",
+        "FHM_Portal",
+        "Customized_Reqs",
+        "Hospitals",
+        "Critical_Results_Contact",
+        "Critical_Results_Contact_Number",
+        "Practice_Name_Without_Location",
+        "EMR",
+        "Practices_Ignite",
+        "M_O_M_of_On_Boarding"
+    ]
+}
+
+
+
+
